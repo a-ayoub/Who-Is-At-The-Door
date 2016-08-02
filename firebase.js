@@ -13,6 +13,7 @@ firebase.initializeApp({
 
 
 var ref = firebase.database().ref("Alexa");
+var name = './photo/image.jpg';
 
 ref.on("child_changed", function(snap) {
   console.log("initial data loaded!", snap.key +":",snap.val());
@@ -20,12 +21,11 @@ ref.on("child_changed", function(snap) {
   	//add PIR logic here, if fails, send fail message to database, or else callback to below
 
   	//add take image logic here, callback to the below request
-    const Raspistill = spawn('raspistill',['-e','jpg','-o','./photo/image-'+(++photoNum)+'.jpg']);
+    const Raspistill = spawn('raspistill',['-e','jpg','-o','./photo/image.jpg']);
     Raspistill.on('close', (code) => {
-      var name = './photo/image-'+photoNum+'.jpg';
       fs.readFile(name, function(err, data) {
          var base64data = new Buffer(data).toString('base64');
-         console.log(base64data);
+         // console.log(base64data);
          var options = {
           url: 'https://api.kairos.com/recognize',
           headers:{
@@ -42,6 +42,9 @@ ref.on("child_changed", function(snap) {
           if(error){
             ref.child("Read").set("Failed");
           }
+          else if(JSON.parse(body)["Errors"]){
+            ref.child("Read").set("noPerson");
+          }
           else{
             var status = JSON.parse(body)["images"][0]["transaction"]["status"];
             if(status == "success"){
@@ -53,6 +56,44 @@ ref.on("child_changed", function(snap) {
             }
           }
         });
+      });
+    });
+  }
+  else if(snap.val()!=null && snap.val().includes('callFacialTrain')){
+    fs.readFile(name, function(err, data) {
+       var base64data = new Buffer(data).toString('base64');
+       // console.log(base64data);
+       var options = {
+        url: 'https://api.kairos.com/enroll',
+        headers:{
+          'Content-Type': 'application/json',
+          'app_id': '013361a9',
+          'app_key': '99d2e27522444ed77016ace28603b91a'
+        },
+        body: JSON.stringify({
+          image: base64data,
+          subject_id: snap.val().substring(16),
+          gallery_name: 'alexaTest',
+          selector: 'SETPOSE',
+          symmetricFill: 'true'
+        })
+      };
+      request.post(options,function(error, response, body){
+        if(error){
+          ref.child("Read").set("Failed");
+        }
+        else if(JSON.parse(body)["Errors"]){
+          ref.child("Read").set("Failed");
+        }
+        else{
+          var status = JSON.parse(body)["images"][0]["transaction"]["status"];
+          if(status == "success"){
+            ref.child("Read").set("doneTrain");
+          }
+          else if (status == "failure"){
+            ref.child("Read").set("Failed");
+          }
+        }
       });
     });
   }

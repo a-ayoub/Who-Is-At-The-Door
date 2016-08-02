@@ -35,6 +35,9 @@ whosDoor.prototype.eventHandlers.onLaunch = function (launchRequest, session, re
             var speechResponse = Responses.failRecognize()
             response.ask(speechResponse.speechOutput, speechResponse.repromptText)
         }
+        else if(name == "noPerson"){
+            response.tell(Responses.PIRRepromptText)
+        }
         else{
             setRecognizeIntent(session)
             setSessionName(session,name)
@@ -58,6 +61,9 @@ whosDoor.prototype.intentHandlers = {
                 var speechResponse = Responses.failRecognize()
                 response.ask(speechResponse.speechOutput, speechResponse.repromptText)
             }
+            else if(name == "noPerson"){
+                response.tell(Responses.PIRRepromptText)
+            }
             else{
                 setRecognizeIntent(session)
                 setSessionName(session,name)
@@ -70,9 +76,14 @@ whosDoor.prototype.intentHandlers = {
     "AMAZON.YesIntent": function(intent, session, response){
         switch(session.attributes.AskIntentStatus) {
             case AskIntent.RECOGNIZE:
-                initiatePiFacialTraining(session, response, function(){
-                    var speechResponse = Responses.finishTrainIntent(session.attributes.NameRecognition)
-                    response.ask(speechResponse.speechOutput, speechResponse.repromptText)
+                initiatePiFacialTraining(session, response, function(status){
+                    if(status == "Success"){
+                        var speechResponse = Responses.finishTrainIntent(session.attributes.NameRecognition)
+                        response.ask(speechResponse.speechOutput, speechResponse.repromptText)
+                    }
+                    else{
+                        response.tell(Responses.noTrainText);
+                    }
                 });
                 break
             case AskIntent.NO_RECOGNIZE:
@@ -82,14 +93,21 @@ whosDoor.prototype.intentHandlers = {
                 break
             default:
                 console.log("ERROR: Unable to determine yes response")
-                response.tell(Responses.exitRepromptText);
+                response.tell(Responses.exitText);
                 break
         }
     },
     "SetNameIntent": function(intent, session, response){
         var name = intent.slots.UserFirstName.value;
-        var speechResponse = Responses.finishTrainIntent(name)
-        response.ask(speechResponse.speechOutput, speechResponse.repromptText)
+        trainUnknownPerson(session, response, name, function(status){
+            if(status == "Success"){
+                var speechResponse = Responses.finishTrainIntent(name)
+                response.ask(speechResponse.speechOutput, speechResponse.repromptText)
+            }
+            else{
+                response.tell(Responses.noTrainText);
+            }
+        });
     },
     "AMAZON.NoIntent": function (intent, session, response) {
         response.tell(Responses.exitText);
@@ -121,8 +139,13 @@ function initiatePiFacialRecognition(session, response, piCallback){
     });
 }
 function initiatePiFacialTraining(session, response, piCallback){
-    database.trainFaceCall(function(){
-        piCallback();
+    database.trainFaceCall(session.attributes.NameRecognition,function(status){
+        piCallback(status);
+    });
+}
+function trainUnknownPerson(session, response, name, piCallback){
+    database.trainFaceCall(name, function(status){
+        piCallback(status);
     });
 }
 

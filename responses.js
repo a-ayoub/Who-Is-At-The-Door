@@ -1,6 +1,7 @@
 module.exports = {
-	PIRRepromptText: " I don't see anyone out there, would you like to check again?",
+	PIRRepromptText: " I don't see anyone out there",
 	exitText: " Okay, the person at the door will not be trained.",
+	noTrainText: " Could not train person.",
 
 	launchRecognized : function(name){
 		var speechOutput = name + " is at the door. " +
