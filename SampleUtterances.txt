@@ -1,0 +1,10 @@
+DoorIntent who is at the door
+DoorIntent who is there
+DoorIntent tell me who is at the door
+DoorIntent who's at the door
+DoorIntent who's there
+
+SetNameIntent {UserFirstName}
+SetNameIntent set {UserFirstName}
+SetNameIntent remember {UserFirstName}
+SetNameIntent add {UserFirstName}
