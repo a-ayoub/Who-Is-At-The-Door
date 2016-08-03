@@ -84,7 +84,7 @@ whosDoor.prototype.intentHandlers = {
                 initiatePiFacialTraining(session, response, function(status){                                 //If recognized, facial training process occurs
                     if(status == "Success"){
                         var speechResponse = Responses.finishTrainIntent(session.attributes.NameRecognition)  //Response on success of facial training
-                        response.ask(speechResponse.speechOutput, speechResponse.repromptText)
+                        response.tell(speechResponse.speechOutput)
                     }
                     else{
                         response.tell(Responses.noTrainText);                                                  //Response on failed facial training
@@ -108,7 +108,7 @@ whosDoor.prototype.intentHandlers = {
         trainUnknownPerson(session, response, name, function(status){                   //Train person's face with given name
             if(status == "Success"){
                 var speechResponse = Responses.finishTrainIntent(name)
-                response.ask(speechResponse.speechOutput, speechResponse.repromptText)
+                response.tell(speechResponse.speechOutput)
             }
             else{
                 response.tell(Responses.noTrainText);
