@@ -8,8 +8,8 @@ var queryString = require('querystring');
 var firebase = require('firebase');
 
 firebase.initializeApp({
-  databaseURL: 'https://whos-at-the-door-bd527.firebaseio.com',
-  serviceAccount: './Who\'s\ At\ The\ Door-524db9c73091.json'
+  databaseURL: '<firebaseURL>',
+  serviceAccount: './<firebaseSecurityProfile>.json'
 });
 
 /* Access to database */

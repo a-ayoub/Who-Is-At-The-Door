@@ -10,8 +10,8 @@ const fs = require('fs');
 var photoNum = 0;
 
 firebase.initializeApp({
-  databaseURL: 'https://whos-at-the-door-bd527.firebaseio.com',
-  serviceAccount: './Who\'s\ At\ The\ Door-524db9c73091.json'
+  databaseURL: '<firebaseURLhere>',
+  serviceAccount: './<firebaseSecurityProfile>.json'
 });
 
 /* Local Database Access */
@@ -31,8 +31,8 @@ ref.on("child_changed", function(snap) {
           url: 'https://api.kairos.com/recognize',
           headers:{
             'Content-Type': 'application/json',
-            'app_id': '013361a9',
-            'app_key': '99d2e27522444ed77016ace28603b91a'
+            'app_id': '<KairosAppID>',
+            'app_key': '<KairosAppKey>'
           },
           body: JSON.stringify({
             image: base64data,                                              //After picture is taken, image data is set on the facial recognition API
@@ -69,8 +69,8 @@ ref.on("child_changed", function(snap) {
         url: 'https://api.kairos.com/enroll',
         headers:{
           'Content-Type': 'application/json',
-          'app_id': '013361a9',
-          'app_key': '99d2e27522444ed77016ace28603b91a'
+          'app_id': '<KairosAppID>',
+          'app_key': '<KairosAppKey>'
         },
         body: JSON.stringify({  
           image: base64data,                            //Uses the previously taken picture of the person's face to train

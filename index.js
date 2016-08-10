@@ -1,5 +1,5 @@
 /* Amazon Alexa App ID */
-var APP_ID = 'amzn1.echo-sdk-ams.app.611b37cd-2e37-433f-b70b-5f7b69c9c99f';
+var APP_ID = '<Amazon APP ID HERE>';
 
 /* Include skill, Alexa responses, and DB logic files */
 var AlexaSkill = require('./AlexaSkill.js');
